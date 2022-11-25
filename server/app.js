@@ -1,7 +1,7 @@
-const bodyParser = require("body-parser")
+const bodyParser = require("body-parser");
 const express = require("express");
-const { db, User } = require('./db');
-const { ValidationError } = require('sequelize');
+const { db, User } = require("./db");
+const { ValidationError } = require("sequelize");
 
 const app = express();
 app.use(bodyParser.json());
@@ -22,7 +22,7 @@ app.get("/users/:id", async (req, res) => {
   res.json(user);
 });
 
-app.post("/users/", async ({body}, res, next) => {
+app.post("/users/", async ({ body }, res, next) => {
   try {
     const user = await User.create(body);
     res.json(user);

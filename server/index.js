@@ -1,6 +1,6 @@
 const PORT = process.env.PORT || 3000;
-const app = require('./app');
-const { db } = require('./db');
+const app = require("./app");
+const { db } = require("./db");
 
 db.sync()
   .then(() => {

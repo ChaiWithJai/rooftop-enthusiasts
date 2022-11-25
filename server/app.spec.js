@@ -1,11 +1,11 @@
 const request = require("supertest");
 const app = require("./app");
-const { db, User } = require('./db');
+const { db, User } = require("./db");
 
 beforeEach(async () => {
   await db.sync({ force: true });
   await User.bulkCreate([
-    { id: 123, name: 'Jai Bhagat', user: '@ChaiWithJai' },
+    { id: 123, name: "Jai Bhagat", user: "@ChaiWithJai" },
   ]);
 });
 
@@ -31,11 +31,13 @@ describe("GET /users/:id", () => {
     expect(response.status).toEqual(200);
     expect(response.body.createdAt).toBeDefined();
     expect(response.body.updatedAt).toBeDefined();
-    expect(response.body).toEqual(expect.objectContaining({
-      id: 123,
-      user: "@ChaiWithJai",
-      name: "Jai Bhagat",
-    }));
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: 123,
+        user: "@ChaiWithJai",
+        name: "Jai Bhagat",
+      })
+    );
   });
 
   test("should respond with 404 if user record does not exist", async () => {
@@ -71,23 +73,23 @@ describe("POST /users", () => {
     expect(response.body).toEqual(expect.objectContaining(payload));
   });
 
-  test('returns 400 and errors for missing name', async () => {
+  test("returns 400 and errors for missing name", async () => {
     // arrange
     const api = request(app);
-    const route = '/users';
-    const params = { user: 'rilkes' }; // intentionally missing name
-  
+    const route = "/users";
+    const params = { user: "rilkes" }; // intentionally missing name
+
     const response = await api.post(route).send(params);
-  
+
     expect(response.status).toEqual(400);
     expect(response.body.errors).toEqual([
       {
-        message: 'Name is a required field',
-        path: 'name',
+        message: "Name is a required field",
+        path: "name",
         value: null,
       },
     ]);
   });
 
-  test.todo('responds 500 in case of error');
+  test.todo("responds 500 in case of error");
 });
