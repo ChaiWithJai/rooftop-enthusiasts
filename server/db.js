@@ -1,4 +1,4 @@
-const { Sequelize } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
 
 // don't log SQL Statements in test environment, unless DB_LOGGING environment
 // variable is explicitly set
@@ -6,6 +6,9 @@ const logging = process.env.DB_LOGGING || process.env.NODE_ENV !== 'test';
 
 const db = new Sequelize('sqlite::memory:', { logging });
 
-const User = db.define('User', {});
+const User = db.define('User', {
+    name: DataTypes.STRING,
+    user: DataTypes.STRING,
+});
 
 module.exports = {db, User};
