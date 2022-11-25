@@ -1,5 +1,13 @@
 const request = require("supertest");
 const app = require("./app");
+const { db, User } = require('./db');
+
+beforeEach(async () => {
+  await db.sync({ force: true });
+  await User.bulkCreate([
+    { id: 123, name: 'Jai Bhagat', user: '@ChaiWithJai' },
+  ]);
+});
 
 describe("GET / responds with hello world", () => {
   test('should return {hello: "world" }', async () => {
@@ -21,11 +29,13 @@ describe("GET /users/:id", () => {
 
     // assert
     expect(response.status).toEqual(200);
-    expect(response.body).toEqual({
+    expect(response.body.createdAt).toBeDefined();
+    expect(response.body.updatedAt).toBeDefined();
+    expect(response.body).toEqual(expect.objectContaining({
       id: 123,
       user: "@ChaiWithJai",
       name: "Jai Bhagat",
-    });
+    }));
   });
 
   test("should respond with 404 if user record does not exist", async () => {
@@ -43,7 +53,7 @@ describe("GET /users/:id", () => {
   });
 });
 
-describe("POST /users/:id", () => {
+describe("POST /users", () => {
   test("should respond with newly created user record using JSON payload", async () => {
     // arrange
     const api = request(app);
@@ -56,13 +66,28 @@ describe("POST /users/:id", () => {
     // assert
     expect(response.status).toEqual(200);
     expect(response.body.id).toBeDefined();
+    expect(response.body.createdAt).toBeDefined();
+    expect(response.body.updatedAt).toBeDefined();
     expect(response.body).toEqual(expect.objectContaining(payload));
-
-    // temporary assertion on persisted record
-    const getResponse = await request(app).get(`/users/${response.body.id}`);
-    expect(getResponse.body).toEqual({
-      id: response.body.id,
-      ...payload,
-    });
   });
+
+  test('returns 400 and errors for missing name', async () => {
+    // arrange
+    const api = request(app);
+    const route = '/users';
+    const params = { user: 'rilkes' }; // intentionally missing name
+  
+    const response = await api.post(route).send(params);
+  
+    expect(response.status).toEqual(400);
+    expect(response.body.errors).toEqual([
+      {
+        message: 'Name is a required field',
+        path: 'name',
+        value: null,
+      },
+    ]);
+  });
+
+  test.todo('responds 500 in case of error');
 });
