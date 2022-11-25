@@ -47,7 +47,7 @@ describe("POST /users/:id", () => {
   test("should respond with newly created user record using JSON payload", async () => {
     // arrange
     const api = request(app);
-    const payload = {name: 'Pablo Picasso', user: '@piz_piz'};
+    const payload = { name: "Pablo Picasso", user: "@piz_piz" };
     const route = `/users`;
 
     // act
@@ -57,5 +57,12 @@ describe("POST /users/:id", () => {
     expect(response.status).toEqual(200);
     expect(response.body.id).toBeDefined();
     expect(response.body).toEqual(expect.objectContaining(payload));
+
+    // temporary assertion on persisted record
+    const getResponse = await request(app).get(`/users/${response.body.id}`);
+    expect(getResponse.body).toEqual({
+      id: response.body.id,
+      ...payload,
+    });
   });
 });
